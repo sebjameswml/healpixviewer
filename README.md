@@ -41,6 +41,24 @@ mkdir build
 cd build
 cmake ..
 make
-cd ..
-./build/viewer data/example.fit
+./viewer path/to/fitfile.fit
+```
+
+## Finding some example data
+
+You can open the Bayestar data that @lpsinger uses in his viewer:
+
+```bash
+wget http://ligo.org/science/first2years/2015/compare/18951/bayestar.fits.gz
+./build/viewer bayestar.fits.gz
+```
+
+I also managed to open cosmic microwave background data from the [Planck Legacy Archive](http://pla.esac.esa.int/pla/#home). I'm not sure these make very good examples yet.
+
+```bash
+wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13749 -O skymap1.fits
+./build/viewer skymap1.fits
+
+wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13612 -O skymap2.fits
+./build/viewer skymap2.fits
 ```

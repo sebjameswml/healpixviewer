@@ -13,6 +13,7 @@
 #include <sstream>
 #include <morph/Visual.h>
 #include <morph/HealpixVisual.h>
+#include <morph/Config.h>
 #include <chealpix.h>
 
 int main (int argc, char** argv)
@@ -27,14 +28,15 @@ int main (int argc, char** argv)
 
     // Read data from the fits file
     int64_t nside = 0;
-    char coordsys[80];
-    char ordering[80];
+    char coordsys[80]; // Might be "C" or "GALACTIC". Not sure what to do with this though!
+    char ordering[80]; // NESTED
     // read_healpix_map comes from chealpix. It allocates memory
     float* hpmap = read_healpix_map (fitsfilename.c_str(), &nside, coordsys, ordering);
     if (!hpmap) {
         std::cout << "Failed to read the healpix map at " << fitsfilename << std::endl;
         return -1;
     }
+    std::cout << "coordsys: " << coordsys << "\nordering: " << ordering << std::endl;
 
     int32_t ord = 0;
     int32_t _n = nside;
@@ -47,7 +49,6 @@ int main (int argc, char** argv)
     auto hpv = std::make_unique<morph::HealpixVisual<float>> (morph::vec<float>{0,0,0});
     v.bindmodel (hpv);
     hpv->set_order (ord);
-    hpv->cm.setType (morph::ColourMapType::Plasma);
 
     // Convert the data read by read_healpix_map to nest ordering if necessary and write into the
     // healpix visual's pixeldata
@@ -67,17 +68,22 @@ int main (int argc, char** argv)
 
     std::cout << "pixeldata range: " << hpv->pixeldata.range() << std::endl;
 
-    hpv->colourScale.reset();
-    // Manually compute scaling:
-    //hpv->colourScale.compute_autoscale (-0.001, 0.001);
-    // Or autoscale from the data:
-    hpv->colourScale.do_autoscale = true;
-    //hpv->colourScale.setlog();
+    // Use relief to visualize
     hpv->relief = true;
+
+    hpv->colourScale.reset();
     hpv->reliefScale.reset();
-    hpv->reliefScale.do_autoscale = true;
-    //hpv->colourScale.setlog();
-    hpv->reliefScale.output_range.set(0, 0.5f);
+
+    // Set a colour map
+    hpv->cm.setType (morph::ColourMapType::Jet);
+
+    // Manually compute scaling:
+    hpv->colourScale.do_autoscale = false;
+    hpv->colourScale.compute_autoscale (-0.0005, 0.0005);
+
+    hpv->reliefScale.do_autoscale = false;
+    hpv->reliefScale.output_range.set(-0.1f, 0.1f);
+    hpv->reliefScale.compute_autoscale (-0.002, 0.002);
 
     std::stringstream ss;
     constexpr bool centre_horz = true;
@@ -88,7 +94,6 @@ int main (int argc, char** argv)
     // Finalize and add the model
     hpv->finalize();
     v.addVisualModel (hpv);
-
 
     v.keepOpen();
     return 0;

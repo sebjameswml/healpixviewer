@@ -52,6 +52,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMORPH_FONTS_DIR=\"\\\"${PROJECT_SOURCE
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(Freetype REQUIRED)
+# Note: chealpix is also required! E.g. from apt install libchealpix-dev on Debian/Ubuntu
 
 # include files for graphics
 include_directories(${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS})
@@ -66,7 +67,7 @@ include_directories(BEFORE ${MORPH_INCLUDE_PATH})         # Allows morph/Header.
 
 # The viewer is compiled from a single c++ file
 add_executable(viewer viewer.cpp)
-target_link_libraries(viewer OpenGL::GL Freetype::Freetype glfw)
+target_link_libraries(viewer OpenGL::GL Freetype::Freetype glfw chealpix)
 
 #
 # All done!

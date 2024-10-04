@@ -5,22 +5,24 @@ This is a simple HEALPix viewer, which uses the [`morph::HealpixVisual`](https:/
 ## Dependencies
 
 If you are using Debian or Ubuntu, the following `apt` command should
-install the morphologica dependencies.
+install the morphologica dependencies as well as the official Healpix
+C library.
 
 ```bash
 sudo apt install build-essential cmake git wget  \
                  freeglut3-dev libglu1-mesa-dev libxmu-dev libxi-dev \
-                 libglfw3-dev libfreetype-dev
+                 libglfw3-dev libfreetype-dev libchealpix-dev
 ```
 
-On Arch Linux the following command should install dependencies:
+On Arch Linux, this should be the `pacman` command:
 ```bash
-sudo pacman -S vtk lapack blas freeglut glfw-wayland
+sudo pacman -S vtk lapack blas freeglut glfw-wayland chealpix
 ```
 
-On Fedora Linux, the following command should install the required dependencies
+On Fedora Linux, the following `dnf` command should install the dependencies:
 ```bash
-sudo dnf install gcc cmake libglvnd-devel mesa-libGL-devel glfw-devel freetype-devel
+sudo dnf install gcc cmake libglvnd-devel mesa-libGL-devel glfw-devel \
+                 freetype-devel cfitsio-dev chealpix-dev
 ```
 
 If you're building on a Mac, you can refer to the [Mac

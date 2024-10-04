@@ -7,6 +7,7 @@
  * Author Seb James
  * Date 2024/10/04
  */
+
 #include <cstdint>
 #include <cstdlib>
 #include <sstream>
@@ -63,6 +64,20 @@ int main (int argc, char** argv)
     }
     // Can now free the memory read by read_healpix_map
     free (hpmap);
+
+    std::cout << "pixeldata range: " << hpv->pixeldata.range() << std::endl;
+
+    hpv->colourScale.reset();
+    // Manually compute scaling:
+    //hpv->colourScale.compute_autoscale (-0.001, 0.001);
+    // Or autoscale from the data:
+    hpv->colourScale.do_autoscale = true;
+    //hpv->colourScale.setlog();
+    hpv->relief = true;
+    hpv->reliefScale.reset();
+    hpv->reliefScale.do_autoscale = true;
+    //hpv->colourScale.setlog();
+    hpv->reliefScale.output_range.set(0, 0.5f);
 
     std::stringstream ss;
     constexpr bool centre_horz = true;

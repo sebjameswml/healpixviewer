@@ -1,6 +1,0 @@
-{
-    "Description" : "Viewer scaling parameters for http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13486",
-    "input_colourmap_range" : [ -0.0005, 0.0005 ],
-    "input_reliefmap_range" : [ -0.002, 0.002 ],
-    "output_reliefmap_range" : [-0.1, 0.1 ]
-}

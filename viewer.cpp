@@ -36,11 +36,44 @@ int main (int argc, char** argv)
         std::cout << "Failed to read the healpix map at " << fitsfilename << std::endl;
         return -1;
     }
-    std::cout << "coordsys: " << coordsys << "\nordering: " << ordering << std::endl;
 
+    // Visualization parameters that might be set from JSON config
+    int32_t order_reduce = 0;
+    bool use_relief = false;
+    std::string colourmap_type = "plasma";
+    morph::range<float> colourmap_input_range; // use value to indicate autoscaling
+    colourmap_input_range.search_init(); // sets min to numeric_limits<>::max and max to numeric_limits<>::lowest
+    morph::range<float> reliefmap_input_range;
+    reliefmap_input_range.search_init();
+    morph::range<float> reliefmap_output_range (0, 0.1f);
+
+    // Access config if it exists
+    std::string conf_file = fitsfilename + ".json";
+    std::cout << "Attempt to read JSON config at " << conf_file << "...\n";
+    morph::Config conf (conf_file);
+    if (conf.ready) {
+        order_reduce = conf.get<int32_t>("order_reduce", 0);
+        use_relief = conf.get<bool>("use_relief", false);
+        colourmap_type = conf.getString("colourmap_type", "plasma");
+        std::string key = "colourmap_input_range";
+        morph::vvec<float> tmp_vvec = conf.getvvec<float> (key);
+        if (tmp_vvec.size() == 2) {
+            colourmap_input_range.set (tmp_vvec[0], tmp_vvec[1]);
+            reliefmap_input_range.set (tmp_vvec[0], tmp_vvec[1]);
+        }
+        key = "reliefmap_input_range";
+        tmp_vvec = conf.getvvec<float> (key);
+        key = "reliefmap_output_range";
+        if (tmp_vvec.size() == 2) { reliefmap_input_range.set (tmp_vvec[0], tmp_vvec[1]); }
+        tmp_vvec = conf.getvvec<float> (key);
+        if (tmp_vvec.size() == 2) { reliefmap_output_range.set (tmp_vvec[0], tmp_vvec[1]); }
+    }
+
+    // Now extract convert nside to order and check order_reduce
     int32_t ord = 0;
     int32_t _n = nside;
     while ((_n >>= 1) != 0) { ++ord; } // Finds order as long as nside is a square (which it will be)
+    if (ord - order_reduce < 1) { throw std::runtime_error ("Can't drop order that much"); }
 
     // Create a visual scene/window object
     morph::Visual v(1024, 768, "Healpix FITS file viewer");
@@ -48,19 +81,24 @@ int main (int argc, char** argv)
     // Create a HealpixVisual
     auto hpv = std::make_unique<morph::HealpixVisual<float>> (morph::vec<float>{0,0,0});
     v.bindmodel (hpv);
-    hpv->set_order (ord);
+    hpv->set_order (ord - order_reduce);
+    // Could set radius in hpv if required, but seems simplest to leave it always as 1
 
     // Convert the data read by read_healpix_map to nest ordering if necessary and write into the
     // healpix visual's pixeldata
+    float downdivisor = std::pow(4, order_reduce);
+    float downmult = 1.0f / downdivisor;
     hpv->pixeldata.resize (hpv->n_pixels());
     if (ordering[0] == 'R') { // R means ring ordering
-        for (int64_t i_nest = 0; i_nest < hpv->n_pixels(); i_nest++) {
+        for (int64_t i_nest = 0; i_nest < 12 * nside * nside; i_nest++) {
             int64_t i_ring = hp::nest2ring (nside, i_nest);
-            hpv->pixeldata[i_nest] = hpmap[i_ring];
+            int64_t i_nest_down = i_nest >> (2 * order_reduce);
+            hpv->pixeldata[i_nest_down] += hpmap[i_ring] * downmult;
         }
     } else { // Assume NEST ordering, so simply copy
-        for (int64_t i_nest = 0; i_nest < hpv->n_pixels(); i_nest++) {
-            hpv->pixeldata[i_nest] = hpmap[i_nest];
+        for (int64_t i_nest = 0; i_nest < 12 * nside * nside; i_nest++) {
+            int64_t i_nest_down = i_nest >> (2 * order_reduce);
+            hpv->pixeldata[i_nest_down] += hpmap[i_nest] * downmult;
         }
     }
     // Can now free the memory read by read_healpix_map
@@ -68,28 +106,49 @@ int main (int argc, char** argv)
 
     std::cout << "pixeldata range: " << hpv->pixeldata.range() << std::endl;
 
-    // Use relief to visualize
-    hpv->relief = true;
+    // Use relief to visualize?
+    hpv->relief = use_relief;
 
     hpv->colourScale.reset();
     hpv->reliefScale.reset();
 
     // Set a colour map
-    hpv->cm.setType (morph::ColourMapType::Jet);
+    hpv->cm.setType (colourmap_type);
 
-    // Manually compute scaling:
-    hpv->colourScale.do_autoscale = false;
-    hpv->colourScale.compute_autoscale (-0.0005, 0.0005);
+    // Automatically or manually compute colour scaling:
+    if (colourmap_input_range.min == std::numeric_limits<float>::max()
+        && colourmap_input_range.max == std::numeric_limits<float>::lowest()) {
+        // Auto scale colur
+        hpv->colourScale.do_autoscale = true;
+    } else {
+        hpv->colourScale.do_autoscale = false;
+        hpv->colourScale.compute_autoscale (colourmap_input_range.min, colourmap_input_range.max);
+    }
 
-    hpv->reliefScale.do_autoscale = false;
-    hpv->reliefScale.output_range.set(-0.1f, 0.1f);
-    hpv->reliefScale.compute_autoscale (-0.002, 0.002);
+    // Determine whether to autoscale or use users config for relief map scaling output range
+    if (reliefmap_output_range.min == std::numeric_limits<float>::max()
+        && reliefmap_output_range.max == std::numeric_limits<float>::lowest()) {
+        hpv->reliefScale.output_range.set (0, 0.1f);
+    } else {
+        hpv->reliefScale.output_range.set (reliefmap_output_range.min, reliefmap_output_range.max);
+    }
+
+    // Determine whether to autoscale or use users scaling for relief map scaling input range
+    if (reliefmap_input_range.min == std::numeric_limits<float>::max()
+        && reliefmap_input_range.max == std::numeric_limits<float>::lowest()) {
+        hpv->reliefScale.do_autoscale = true;
+    } else {
+        hpv->reliefScale.do_autoscale = false;
+        hpv->reliefScale.compute_autoscale (reliefmap_input_range.min, reliefmap_input_range.max);
+    }
 
     std::stringstream ss;
-    constexpr bool centre_horz = true;
+    constexpr bool centre_horz = false;
+    auto pord = ord - order_reduce;
     ss << ord << (ord == 1 ? "st" : (ord == 2 ? "nd" : (ord == 3 ? "rd" : "th")))
-       << " order HEALPix data from " << fitsfilename << "\n";
-    hpv->addLabel (ss.str(), {0.0f, -1.2f , 0.0f }, morph::TextFeatures{0.08f, centre_horz});
+       << " order HEALPix data from " << fitsfilename << " plotted at "
+       << pord << (pord == 1 ? "st" : (pord == 2 ? "nd" : (pord == 3 ? "rd" : "th"))) << " order\n";
+    v.addLabel (ss.str(), {0.0f, 0.0f, 0.0f}, morph::TextFeatures{0.005f, centre_horz});
 
     // Finalize and add the model
     hpv->finalize();

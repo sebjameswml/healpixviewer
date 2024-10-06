@@ -14,7 +14,25 @@
 #include <morph/Visual.h>
 #include <morph/HealpixVisual.h>
 #include <morph/Config.h>
+#include <morph/unicode.h>
 #include <chealpix.h>
+
+// I extend morph::Visual simply to modify the coordinate arrows object in the
+// constructor so their labels are not simply x, y and z.
+class MyVisual : public morph::Visual<>
+{
+public:
+    MyVisual (int width, int height, const std::string& title) : morph::Visual<> (width, height, title)
+    {
+        using morph::unicode;
+        this->coordArrows->clear();
+        this->coordArrows->x_label = unicode::toUtf8 (unicode::lambda)+std::string("=0");
+        this->coordArrows->y_label = unicode::toUtf8 (unicode::lambda) + std::string("=") + unicode::toUtf8 (unicode::pi) + ("/2");
+        this->coordArrows->z_label = "N";
+        this->coordArrows->initAxisLabels();
+        this->coordArrows->reinit();
+    }
+};
 
 int main (int argc, char** argv)
 {
@@ -52,31 +70,31 @@ int main (int argc, char** argv)
     std::cout << "Attempt to read JSON config at " << conf_file << "...\n";
     morph::Config conf (conf_file);
     if (conf.ready) {
+        // Allow command line overrides. e.g. viewer file.fits -co:colourmap_type=viridis
+        conf.process_args (argc, argv);
         order_reduce = conf.get<int32_t>("order_reduce", 0);
         use_relief = conf.get<bool>("use_relief", false);
         colourmap_type = conf.getString("colourmap_type", "plasma");
-        std::string key = "colourmap_input_range";
-        morph::vvec<float> tmp_vvec = conf.getvvec<float> (key);
+        morph::vvec<float> tmp_vvec = conf.getvvec<float> ("colourmap_input_range");
         if (tmp_vvec.size() == 2) {
             colourmap_input_range.set (tmp_vvec[0], tmp_vvec[1]);
             reliefmap_input_range.set (tmp_vvec[0], tmp_vvec[1]);
         }
-        key = "reliefmap_input_range";
-        tmp_vvec = conf.getvvec<float> (key);
-        key = "reliefmap_output_range";
+        tmp_vvec = conf.getvvec<float> ("reliefmap_input_range");
         if (tmp_vvec.size() == 2) { reliefmap_input_range.set (tmp_vvec[0], tmp_vvec[1]); }
-        tmp_vvec = conf.getvvec<float> (key);
+        tmp_vvec = conf.getvvec<float> ("reliefmap_output_range");
         if (tmp_vvec.size() == 2) { reliefmap_output_range.set (tmp_vvec[0], tmp_vvec[1]); }
     }
 
-    // Now extract convert nside to order and check order_reduce
+    // Now convert nside to order and check order_reduce
     int32_t ord = 0;
     int32_t _n = nside;
     while ((_n >>= 1) != 0) { ++ord; } // Finds order as long as nside is a square (which it will be)
     if (ord - order_reduce < 1) { throw std::runtime_error ("Can't drop order that much"); }
 
     // Create a visual scene/window object
-    morph::Visual v(1024, 768, "Healpix FITS file viewer");
+    MyVisual v(1024, 768, "Healpix FITS file viewer");
+    v.setSceneRotation (morph::Quaternion<float>{ float{0.5}, float{-0.5}, float{-0.5}, float{-0.5} });
 
     // Create a HealpixVisual
     auto hpv = std::make_unique<morph::HealpixVisual<float>> (morph::vec<float>{0,0,0});
@@ -150,10 +168,10 @@ int main (int argc, char** argv)
        << pord << (pord == 1 ? "st" : (pord == 2 ? "nd" : (pord == 3 ? "rd" : "th"))) << " order\n";
     v.addLabel (ss.str(), {0.0f, 0.0f, 0.0f}, morph::TextFeatures{0.005f, centre_horz});
 
-    // Finalize and add the model
+    // Finalize and add the model to the morph::Visual scene
     hpv->finalize();
     v.addVisualModel (hpv);
 
-    v.keepOpen();
+    v.keepOpen(); // Until user quits with Ctrl-q
     return 0;
 }

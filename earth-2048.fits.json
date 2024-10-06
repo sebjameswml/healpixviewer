@@ -1,5 +1,5 @@
 {
-    "description" : "Viewer scaling parameters for http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13486",
+    "description" : "Viewer scaling parameters for ___",
 
     "desc_colourmap_input_range" : "A minimum and maximum value that will be scaled (linearly) to the range [0, 1] (to cover the full range of a colourmap). If reliefmap_input_range is not set, then this range may be used for the relief map, also.",
 

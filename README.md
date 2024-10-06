@@ -50,21 +50,29 @@ make
 
 ## Finding some example data
 
-You can open the Bayestar data that @lpsinger uses in his viewer:
+Topographic data of the Earth makes lovely example data:
+
+```bash
+wget https://www.sfu.ca/physics/cosmology/healpix/data/earth-2048.fits
+./build/viewer earth-2048.fits
+```
+Note that there is a JSON config file that matches this filename.
+
+You can open the Bayestar data that @lpsinger uses in his viewer (there's a .json file for this one too):
 
 ```bash
 wget --no-check-certificate http://ligo.org/science/first2years/2015/compare/18951/bayestar.fits.gz
 ./build/viewer bayestar.fits.gz
 ```
 
-I also managed to open cosmic microwave background data from the [Planck Legacy Archive](http://pla.esac.esa.int/pla/#home). I'm not sure these make very good examples yet.
+I also managed to open cosmic microwave background data from the [Planck Legacy Archive](http://pla.esac.esa.int/pla/#home). Again, this uses a JSON file to set up the input data scaling.
 
 ```bash
 wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13486 -O cmb.fits
 ./build/viewer cmb.fits
 ```
 
-These skymaps from the Planck Legacy Archive also appear to work:
+These skymaps from the Planck Legacy Archive also appear to work, though I've not got configs for them yet.
 ```bash
 wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13749 -O skymap1.fits
 ./build/viewer skymap1.fits
@@ -72,3 +80,7 @@ wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13749 -O skymap1.fit
 wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13612 -O skymap2.fits
 ./build/viewer skymap2.fits
 ```
+
+## The Config file
+
+This sets a few parameters for the visualization in JSON, which is read at runtime. Take a look at the examples cmb.fits.json, bayestar.fits.gz.json and earth-2048.fits.json. It should be easy to see how to adapt these to your chosen data.

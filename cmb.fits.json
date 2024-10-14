@@ -7,7 +7,7 @@
 
     "desc_colourmap_type" : "A 1D colourmap to use to visualize. jet, plasma, viridis are options. See a full list at https://abrg-models.github.io/morphologica/ref/visual/colourmap",
 
-    "colourmap_type" : "plasma",
+    "colourmap_type" : "Petrov",
 
     "desc_use_relief" : "If true, then show the HEALPix value by modulating the spheres radius at each pixel",
 

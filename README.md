@@ -73,10 +73,10 @@ wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13486 -O cmb.fits
 ./build/viewer cmb.fits
 ```
 
-These skymaps from the Planck Legacy Archive also appear to work, though I've not got configs for them yet.
+These skymaps from the Planck Legacy Archive also appear to work
 ```bash
-wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13749 -O skymap1.fits
-./build/viewer skymap1.fits
+wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13749 -O skymap.fits
+./build/viewer skymap.fits
 
 wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13612 -O skymap2.fits
 ./build/viewer skymap2.fits
@@ -87,7 +87,7 @@ wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13612 -O skymap2.fit
 This small application has no user interface. As in all my scientific visualization programs, I use a simple configuration file to set options, using the JSON format.
 When you run the program for **file.fits** it will attempt to open **file.fits.json** and read parameters from that file.
 
-The earth-2048.fits.json example looks like this (without the comments in the file):
+The **earth-2048.fits.json** example looks like this (without the comments in the file):
 
 ```json
 {

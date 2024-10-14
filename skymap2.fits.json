@@ -1,0 +1,27 @@
+{
+    "description" : "Viewer scaling parameters for http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13486",
+
+    "desc_colourmap_input_range" : "A minimum and maximum value that will be scaled (linearly) to the range [0, 1] (to cover the full range of a colourmap). If reliefmap_input_range is not set, then this range may be used for the relief map, also.",
+
+    "colourmap_input_range" : [ -0.0001533, 0.2 ],
+
+    "desc_colourmap_type" : "A 1D colourmap to use to visualize. jet, plasma, viridis are options. See a full list at https://abrg-models.github.io/morphologica/ref/visual/colourmap",
+
+    "colourmap_type" : "Petrov",
+
+    "desc_use_relief" : "If true, then show the HEALPix value by modulating the spheres radius at each pixel",
+
+    "use_relief" : true,
+
+    "desc_reliefmap_input_range" : "A minimum and maximum value that will be scaled (linearly) to the range given by output_reliefmap_range",
+
+    "reliefmap_input_range" : [ -0.0001533, 2.85342 ],
+
+    "desc_reliefmap_output_range" : "The range of values that the radius of the sphere (default radius==1) will be modulated by",
+
+    "reliefmap_output_range" : [-0.1, 0.1 ],
+
+    "desc_order_reduce" : "The number of orders to reduce the HEALPix map from the data. For example, to show nside=2048 data, which is 11th order, on a 10th order, nside=1024 HEALPix, set order_reduce to 1",
+
+    "order_reduce" : 0
+}

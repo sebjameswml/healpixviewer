@@ -83,4 +83,32 @@ wget http://pla.esac.esa.int/pla-sl/data-action?MAP.MAP_OID=13612 -O skymap2.fit
 
 ## The Config file
 
-This sets a few parameters for the visualization in JSON, which is read at runtime. Take a look at the examples cmb.fits.json, bayestar.fits.gz.json and earth-2048.fits.json. It should be easy to see how to adapt these to your chosen data.
+This small application has no user interface. As in all my scientific visualization programs, I use a simple configuration file to set options, using the JSON format. When you run the program for `file.fits` it will attempt to open `file.fits.json` and read parameters from that file.
+
+The earth-2048.fits.json example looks like this (without the comments in the file):
+
+```json
+{
+    "colourmap_input_range" : [ -400, 8000 ],
+    "colourmap_type" : "Batlow",
+    "use_relief" : true,
+    "reliefmap_input_range" : [ -400, 8000 ],
+    "reliefmap_output_range" : [-0.00065, 0.0013 ],
+    "order_reduce" : 1
+}
+```
+
+Briefly, you use `_input_range` and `_output_range` to control the colour and relief data scaling.
+Here, a range of values from -400 to 8000 are scaled to [0, 1] for the colourmap (this is never changed) and to [-0.00065, 0.0013] for relief (assuming use_relief is true).
+The units for relif are in arbitrary length units in the 3D scene.
+These should relate to the base radius of the HEALPix sphere, which is 1.
+`order_reduce` allows you to reduce the order of the visualization with respect to your data. Here, I reduce from an 11th order/nside=2048 healpix to a 10th order/nside=1024 healpix, simply averaging the values in 4 pixels down to 1. If you GPU and RAM can do it, you can change this to 0.
+`colourmap_type` allows you to choose from about 80 colour maps in morphologica, which includes maps from [Crameri](https://www.fabiocrameri.ch/colourmaps/), [CET](https://colorcet.com/), [matplotlib](https://matplotlib.org/stable/users/explain/colors/colormaps.html) and [W Lenthe](https://github.com/wlenthe/UniformBicone).
+
+You can override any of the fields on the command line. Try
+
+```bash
+./build/viewer earth-2048.fits -co:colourmap_type=inferno
+```
+
+Take a look at the example files cmb.fits.json, bayestar.fits.gz.json and earth-2048.fits.json. It should be easy to see how to adapt these to your chosen data.

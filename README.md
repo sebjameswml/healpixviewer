@@ -1,6 +1,6 @@
 # HEALPix Viewer program
 
-![A view of the cosmic microwave background radiation](https://github.com/sebjameswml/healpixviewer/blob/main/images/Healpix_FITS_file_viewer.png?raw=true)
+![A view of Earth's topograpy](https://github.com/sebjameswml/healpixviewer/blob/main/images/Earth_on_the_viewer.png?raw=true)
 
 This is a simple HEALPix viewer, which uses the [`morph::HealpixVisual`](https://github.com/ABRG-Models/morphologica/blob/main/morph/HealpixVisual.h) class from [morphologica](https://github.com/ABRG-Models/morphologica).
 

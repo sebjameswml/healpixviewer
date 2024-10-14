@@ -13,6 +13,8 @@
 #include <sstream>
 #include <morph/Visual.h>
 #include <morph/HealpixVisual.h>
+#include <morph/ColourBarVisual.h>
+#include <morph/TxtVisual.h>
 #include <morph/Config.h>
 #include <morph/unicode.h>
 #include <chealpix.h>
@@ -94,9 +96,10 @@ int main (int argc, char** argv)
 
     // Create a visual scene/window object
     MyVisual v(1024, 768, "Healpix FITS file viewer");
+    v.setSceneTrans (morph::vec<float,3>{ float{-0.426631}, float{-0.0724217}, float{-5.00001} });
     v.setSceneRotation (morph::Quaternion<float>{ float{0.5}, float{-0.5}, float{-0.5}, float{-0.5} });
 
-    // Create a HealpixVisual
+    // VisualModel 1. Create a HealpixVisual
     auto hpv = std::make_unique<morph::HealpixVisual<float>> (morph::vec<float>{0,0,0});
     v.bindmodel (hpv);
     hpv->set_order (ord - order_reduce);
@@ -160,17 +163,35 @@ int main (int argc, char** argv)
         hpv->reliefScale.compute_scaling (reliefmap_input_range.min, reliefmap_input_range.max);
     }
 
+    // Finalize and add the model to the morph::Visual scene
+    hpv->finalize();
+    auto hpvp = v.addVisualModel (hpv);
+
+    // VisualModel 2. A text-only VisualModel for some descriptive text
     std::stringstream ss;
     constexpr bool centre_horz = false;
     auto pord = ord - order_reduce;
     ss << ord << (ord == 1 ? "st" : (ord == 2 ? "nd" : (ord == 3 ? "rd" : "th")))
        << " order HEALPix data from " << fitsfilename << " plotted at "
-       << pord << (pord == 1 ? "st" : (pord == 2 ? "nd" : (pord == 3 ? "rd" : "th"))) << " order (colourmap: " << hpv->cm.getTypeStr() << ")\n";
-    v.addLabel (ss.str(), {0.0f, 0.0f, 0.0f}, morph::TextFeatures{0.005f, centre_horz});
+       << pord << (pord == 1 ? "st" : (pord == 2 ? "nd" : (pord == 3 ? "rd" : "th"))) << " order (colourmap: "
+       << hpvp->cm.getTypeStr() << ")";
+    auto tv = std::make_unique<morph::TxtVisual<>> (ss.str(), morph::vec<float>{-1,1.3,0},
+                                                    morph::TextFeatures{0.05f, centre_horz});
+    v.bindmodel (tv);
+    tv->twodimensional = true;
+    tv->finalize();
+    v.addVisualModel (tv);
 
-    // Finalize and add the model to the morph::Visual scene
-    hpv->finalize();
-    v.addVisualModel (hpv);
+    // VisualModel 3. Add a colour bar
+    auto cbv =  std::make_unique<morph::ColourBarVisual<float>>(morph::vec<float>{1.5,0,0});
+    v.bindmodel (cbv);
+    cbv->orientation = morph::colourbar_orientation::vertical;
+    cbv->tickside = morph::colourbar_tickside::right_or_below;
+    // Copy colourmap and scale from HealpixVisual to colourbar visual:
+    cbv->cm = hpvp->cm;
+    cbv->scale = hpvp->colourScale;
+    cbv->finalize();
+    v.addVisualModel (cbv);
 
     v.keepOpen(); // Until user quits with Ctrl-q
     return 0;

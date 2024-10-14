@@ -165,7 +165,7 @@ int main (int argc, char** argv)
     auto pord = ord - order_reduce;
     ss << ord << (ord == 1 ? "st" : (ord == 2 ? "nd" : (ord == 3 ? "rd" : "th")))
        << " order HEALPix data from " << fitsfilename << " plotted at "
-       << pord << (pord == 1 ? "st" : (pord == 2 ? "nd" : (pord == 3 ? "rd" : "th"))) << " order\n";
+       << pord << (pord == 1 ? "st" : (pord == 2 ? "nd" : (pord == 3 ? "rd" : "th"))) << " order (colourmap: " << hpv->cm.getTypeStr() << ")\n";
     v.addLabel (ss.str(), {0.0f, 0.0f, 0.0f}, morph::TextFeatures{0.005f, centre_horz});
 
     // Finalize and add the model to the morph::Visual scene

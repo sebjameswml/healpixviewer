@@ -98,12 +98,12 @@ The earth-2048.fits.json example looks like this (without the comments in the fi
 }
 ```
 
-Briefly, you use `_input_range` and `_output_range` to control the colour and relief data scaling.
-Here, a range of values from -400 to 8000 are scaled to [0, 1] for the colourmap (this is never changed) and to [-0.00065, 0.0013] for relief (assuming use_relief is true).
-The units for relif are in arbitrary length units in the 3D scene.
+Briefly, you use `colour/reliefmap_input_range` and `reliefmap_output_range` to control the colour and relief data scaling.
+Here, a range of values from -400 to 8000 are scaled to [0, 1] for the colourmap (this is never changed) and to [-0.00065, 0.0013] for relief (assuming `use_relief` is true).
+The units for relief are in arbitrary length units in the 3D scene.
 These should relate to the base radius of the HEALPix sphere, which is 1.
-`order_reduce` allows you to reduce the order of the visualization with respect to your data. Here, I reduce from an 11th order/nside=2048 healpix to a 10th order/nside=1024 healpix, simply averaging the values in 4 pixels down to 1. If you GPU and RAM can do it, you can change this to 0.
-`colourmap_type` allows you to choose from about 80 colour maps in morphologica, which includes maps from [Crameri](https://www.fabiocrameri.ch/colourmaps/), [CET](https://colorcet.com/), [matplotlib](https://matplotlib.org/stable/users/explain/colors/colormaps.html) and [W Lenthe](https://github.com/wlenthe/UniformBicone).
+`order_reduce` allows you to reduce the order of the visualization with respect to your data. Here, I reduce from an 11th order/nside=2048 healpix to a 10th order/nside=1024 healpix. This averages the values in groups of 4 pixels down to 1. If your GPU and RAM can do it, you can change this to 0, or you can order_reduce by more.
+`colourmap_type` allows you to choose from about 80 colour maps in morphologica, which includes maps from [Crameri](https://www.fabiocrameri.ch/colourmaps/), [CET](https://colorcet.com/), [matplotlib](https://matplotlib.org/stable/users/explain/colors/colormaps.html) and [W Lenthe](https://github.com/wlenthe/UniformBicone). To find out the names you can use, see [ColourMap documentation](https://abrg-models.github.io/morphologica/ref/visual/colourmap) and `enum class ColourMapType` in [the code](https://github.com/ABRG-Models/morphologica/blob/main/morph/ColourMap.h#L17).
 
 You can override any of the fields on the command line. Try
 

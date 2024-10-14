@@ -140,7 +140,7 @@ int main (int argc, char** argv)
         hpv->colourScale.do_autoscale = true;
     } else {
         hpv->colourScale.do_autoscale = false;
-        hpv->colourScale.compute_autoscale (colourmap_input_range.min, colourmap_input_range.max);
+        hpv->colourScale.compute_scaling (colourmap_input_range.min, colourmap_input_range.max);
     }
 
     // Determine whether to autoscale or use users config for relief map scaling output range
@@ -157,7 +157,7 @@ int main (int argc, char** argv)
         hpv->reliefScale.do_autoscale = true;
     } else {
         hpv->reliefScale.do_autoscale = false;
-        hpv->reliefScale.compute_autoscale (reliefmap_input_range.min, reliefmap_input_range.max);
+        hpv->reliefScale.compute_scaling (reliefmap_input_range.min, reliefmap_input_range.max);
     }
 
     std::stringstream ss;

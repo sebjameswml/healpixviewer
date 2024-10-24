@@ -4,6 +4,8 @@
 
 This is a simple HEALPix viewer, which uses the [`morph::HealpixVisual`](https://github.com/ABRG-Models/morphologica/blob/main/morph/HealpixVisual.h) class from [morphologica](https://github.com/ABRG-Models/morphologica).
 
+It plots your scalar-valued HEALPix dataset on the sphere using a colour map *and* optionally relief to indicate value. There is a wide choice of colour maps (including those from [CET](https://colorcet.com), matplotlib and [Fabio Crameri](https://www.fabiocrameri.ch/colourmaps/)) which, along with the relief scaling, can be configured via a simple JSON file.
+
 ## Dependencies
 
 If you are using Debian or Ubuntu, the following `apt` command should

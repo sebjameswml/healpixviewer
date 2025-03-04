@@ -97,7 +97,7 @@ int main (int argc, char** argv)
     // Create a visual scene/window object
     MyVisual v(1024, 768, "Healpix FITS file viewer");
     v.setSceneTrans (morph::vec<float,3>{ float{-0.426631}, float{-0.0724217}, float{-5.00001} });
-    v.setSceneRotation (morph::Quaternion<float>{ float{0.5}, float{-0.5}, float{-0.5}, float{-0.5} });
+    v.setSceneRotation (morph::quaternion<float>{ float{0.5}, float{-0.5}, float{-0.5}, float{-0.5} });
 
     // VisualModel 1. Create a HealpixVisual
     auto hpv = std::make_unique<morph::HealpixVisual<float>> (morph::vec<float>{0,0,0});

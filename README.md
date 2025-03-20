@@ -14,18 +14,20 @@ C library.
 
 ```bash
 sudo apt install build-essential cmake git wget  \
+                 nlohmann-json3-dev librapidxml-dev \
                  freeglut3-dev libglu1-mesa-dev libxmu-dev libxi-dev \
                  libglfw3-dev libfreetype-dev libchealpix-dev
 ```
 
 On Arch Linux, this should be the `pacman` command:
 ```bash
-sudo pacman -S vtk lapack blas freeglut glfw-wayland chealpix
+sudo pacman -S vtk lapack blas freeglut glfw-wayland nlohmann-json chealpix
 ```
 
 On Fedora Linux, the following `dnf` command should install the dependencies:
 ```bash
 sudo dnf install gcc cmake libglvnd-devel mesa-libGL-devel glfw-devel \
+                 json-devel rapidxml-devel \
                  freetype-devel cfitsio-dev chealpix-dev
 ```
 
@@ -34,6 +36,11 @@ README](https://github.com/ABRG-Models/morphologica/blob/main/README.build.mac.m
 for help. You only need to obtain and build
 [glfw3](https://github.com/ABRG-Models/morphologica/blob/main/README.build.mac.md#glfw3);
 OpenGL and Freetype should already be installed by default.
+
+On Windows, you can use vcpkg to install morphologica and its
+dependencies and you should be able to compile with Visual Studio. If
+the program runs slow, try rebuilding in Release mode rather than
+Debug mode.
 
 ## Building
 

@@ -39,7 +39,7 @@ OpenGL and Freetype should already be installed by default.
 
 On Windows, you can use vcpkg to install morphologica and its
 dependencies and you should be able to compile with Visual Studio. If
-the program runs slow, try rebuilding in Release mode rather than
+the program runs slowly, try rebuilding in Release mode rather than
 Debug mode.
 
 ## Building

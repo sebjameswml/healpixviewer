@@ -26,10 +26,10 @@ class MyVisual : public morph::Visual<>
 public:
     MyVisual (int width, int height, const std::string& title) : morph::Visual<> (width, height, title)
     {
-        using morph::unicode;
+        namespace uc = morph::unicode;
         this->coordArrows->clear();
-        this->coordArrows->x_label = unicode::toUtf8 (unicode::lambda)+std::string("=0");
-        this->coordArrows->y_label = unicode::toUtf8 (unicode::lambda) + std::string("=") + unicode::toUtf8 (unicode::pi) + ("/2");
+        this->coordArrows->x_label = uc::toUtf8 (uc::lambda) + std::string("=0");
+        this->coordArrows->y_label = uc::toUtf8 (uc::lambda) + std::string("=") + uc::toUtf8 (uc::pi) + ("/2");
         this->coordArrows->z_label = "N";
         this->coordArrows->initAxisLabels();
         this->coordArrows->reinit();

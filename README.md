@@ -2,14 +2,14 @@
 
 ![A view of Earth's topograpy and the cosmic microwave background radiation](https://github.com/sebjameswml/healpixviewer/blob/main/images/Earth_and_CMBR.png?raw=true)
 
-This is a simple HEALPix viewer, which uses the [`morph::HealpixVisual`](https://github.com/ABRG-Models/morphologica/blob/main/morph/HealpixVisual.h) class from [morphologica](https://github.com/ABRG-Models/morphologica).
+This is a simple HEALPix viewer, which uses the [`mplot::HealpixVisual`](https://github.com/sebsjames/mathplot/blob/main/morph/HealpixVisual.h) class from [mathplot](https://github.com/sebsjames/mathplot).
 
 It plots your scalar-valued HEALPix dataset on the sphere using a colour map *and* optionally relief to indicate value. There is a wide choice of colour maps (including those from [CET](https://colorcet.com), matplotlib and [Fabio Crameri](https://www.fabiocrameri.ch/colourmaps/)) which, along with the relief scaling, can be configured via a simple JSON file.
 
 ## Dependencies
 
 If you are using Debian or Ubuntu, the following `apt` command should
-install the morphologica dependencies as well as the official Healpix
+install the mathplot dependencies as well as the official Healpix
 C library.
 
 ```bash
@@ -32,13 +32,13 @@ sudo dnf install gcc cmake libglvnd-devel mesa-libGL-devel glfw-devel \
 ```
 
 If you're building on a Mac, you can refer to the [Mac
-README](https://github.com/ABRG-Models/morphologica/blob/main/README.build.mac.md#installation-dependencies-for-mac)
+README](https://github.com/sebsjames/mathplot/blob/main/README.build.mac.md#installation-dependencies-for-mac)
 for help. You only need to obtain and build
-[glfw3](https://github.com/ABRG-Models/morphologica/blob/main/README.build.mac.md#glfw3);
+[glfw3](https://github.com/sebsjames/mathplot/blob/main/README.build.mac.md#glfw3);
 OpenGL and Freetype should already be installed by default.
 
-On Windows, you can use vcpkg to install morphologica and its
-dependencies and you should be able to compile with Visual Studio. If
+On Windows, you will hopefully in future use vcpkg to install mathplot and its
+dependencies and you should be able to compile with Visual Studio (this worked with morphologica but at time of writing has not been set up for mathplot). If
 the program runs slowly, try rebuilding in Release mode rather than
 Debug mode.
 
@@ -119,8 +119,8 @@ Here, I reduce from an 11th order/nside=2048 HEALPix dataset to a 10th order/nsi
 This averages the values in groups of 4 pixels down to 1.
 If your GPU and RAM can do it, you can change this to 0, or you can order_reduce by more.
 
-`colourmap_type` allows you to choose from about 80 colour maps in morphologica, which includes maps from [Crameri](https://www.fabiocrameri.ch/colourmaps/), [CET](https://colorcet.com/), [matplotlib](https://matplotlib.org/stable/users/explain/colors/colormaps.html) and [W Lenthe](https://github.com/wlenthe/UniformBicone).
-To find out the names you can use, see [ColourMap documentation](https://abrg-models.github.io/morphologica/ref/visual/colourmap) and `enum class ColourMapType` in [the code](https://github.com/ABRG-Models/morphologica/blob/main/morph/ColourMap.h#L17).
+`colourmap_type` allows you to choose from about 80 colour maps in mathplot, which includes maps from [Crameri](https://www.fabiocrameri.ch/colourmaps/), [CET](https://colorcet.com/), [matplotlib](https://matplotlib.org/stable/users/explain/colors/colormaps.html) and [W Lenthe](https://github.com/wlenthe/UniformBicone).
+To find out the names you can use, see [ColourMap documentation](https://sebsjames.github.io/mathoplot/ref/visual/colourmap) and `enum class ColourMapType` in [the code](https://github.com/sebsjames/mathplot/blob/main/morph/ColourMap.h#L17).
 
 You can override any of the fields on the command line. Try:
 

@@ -11,28 +11,18 @@
 #include <cstdint>
 #include <cstdlib>
 #include <sstream>
-#include <morph/Visual.h>
-#include <morph/HealpixVisual.h>
-#include <morph/Config.h>
-#include <morph/unicode.h>
-#include <chealpix.h>
 
-// I extend morph::Visual simply to modify the coordinate arrows object in the
-// constructor so their labels are not simply x, y and z.
-class MyVisual : public morph::Visual<>
-{
-public:
-    MyVisual (int width, int height, const std::string& title) : morph::Visual<> (width, height, title)
-    {
-        using morph::unicode;
-        this->coordArrows->clear();
-        this->coordArrows->x_label = unicode::toUtf8 (unicode::lambda)+std::string("=0");
-        this->coordArrows->y_label = unicode::toUtf8 (unicode::lambda) + std::string("=") + unicode::toUtf8 (unicode::pi) + ("/2");
-        this->coordArrows->z_label = "N";
-        this->coordArrows->initAxisLabels();
-        this->coordArrows->reinit();
-    }
-};
+#include <sm/config>
+#include <sm/range>
+#include <sm/vvec>
+#include <sm/vec>
+#include <sm/quaternion>
+
+#include <mplot/Visual.h>
+#include <mplot/HealpixVisual.h>
+#include <mplot/unicode.h>
+
+#include <chealpix.h>
 
 int main (int argc, char** argv)
 {
@@ -59,23 +49,23 @@ int main (int argc, char** argv)
     int32_t order_reduce = 0;
     bool use_relief = false;
     std::string colourmap_type = "plasma";
-    morph::range<float> colourmap_input_range; // use value to indicate autoscaling
+    sm::range<float> colourmap_input_range; // use value to indicate autoscaling
     colourmap_input_range.search_init(); // sets min to numeric_limits<>::max and max to numeric_limits<>::lowest
-    morph::range<float> reliefmap_input_range;
+    sm::range<float> reliefmap_input_range;
     reliefmap_input_range.search_init();
-    morph::range<float> reliefmap_output_range (0, 0.1f);
+    sm::range<float> reliefmap_output_range (0, 0.1f);
 
     // Access config if it exists
     std::string conf_file = fitsfilename + ".json";
     std::cout << "Attempt to read JSON config at " << conf_file << "...\n";
-    morph::Config conf (conf_file);
+    sm::config conf (conf_file);
     if (conf.ready) {
         // Allow command line overrides. e.g. viewer file.fits -co:colourmap_type=viridis
         conf.process_args (argc, argv);
         order_reduce = conf.get<int32_t>("order_reduce", 0);
         use_relief = conf.get<bool>("use_relief", false);
         colourmap_type = conf.getString("colourmap_type", "plasma");
-        morph::vvec<float> tmp_vvec = conf.getvvec<float> ("colourmap_input_range");
+        sm::vvec<float> tmp_vvec = conf.getvvec<float> ("colourmap_input_range");
         if (tmp_vvec.size() == 2) {
             colourmap_input_range.set (tmp_vvec[0], tmp_vvec[1]);
             reliefmap_input_range.set (tmp_vvec[0], tmp_vvec[1]);
@@ -93,11 +83,16 @@ int main (int argc, char** argv)
     if (ord - order_reduce < 1) { throw std::runtime_error ("Can't drop order that much"); }
 
     // Create a visual scene/window object
-    MyVisual v(1024, 768, "Healpix FITS file viewer");
-    v.setSceneRotation (morph::Quaternion<float>{ float{0.5}, float{-0.5}, float{-0.5}, float{-0.5} });
+    mplot::Visual v(1024, 768, "Healpix FITS file viewer");
+    v.setSceneRotation (sm::quaternion<float>{ float{0.5}, float{-0.5}, float{-0.5}, float{-0.5} });
+    // Change the coordinate axes labels from their defaults
+    namespace uc = mplot::unicode;
+    v.updateCoordLabels (uc::toUtf8 (uc::lambda) + std::string("=0"),
+                         uc::toUtf8 (uc::lambda) + std::string("=") + uc::toUtf8 (uc::pi) + std::string("/2"),
+                         std::string("N"));
 
     // Create a HealpixVisual
-    auto hpv = std::make_unique<morph::HealpixVisual<float>> (morph::vec<float>{0,0,0});
+    auto hpv = std::make_unique<mplot::HealpixVisual<float>> (sm::vec<float>{0,0,0});
     v.bindmodel (hpv);
     hpv->set_order (ord - order_reduce);
     // Could set radius in hpv if required, but seems simplest to leave it always as 1
@@ -140,7 +135,7 @@ int main (int argc, char** argv)
         hpv->colourScale.do_autoscale = true;
     } else {
         hpv->colourScale.do_autoscale = false;
-        hpv->colourScale.compute_autoscale (colourmap_input_range.min, colourmap_input_range.max);
+        hpv->colourScale.compute_scaling (colourmap_input_range.min, colourmap_input_range.max);
     }
 
     // Determine whether to autoscale or use users config for relief map scaling output range
@@ -157,7 +152,7 @@ int main (int argc, char** argv)
         hpv->reliefScale.do_autoscale = true;
     } else {
         hpv->reliefScale.do_autoscale = false;
-        hpv->reliefScale.compute_autoscale (reliefmap_input_range.min, reliefmap_input_range.max);
+        hpv->reliefScale.compute_scaling (reliefmap_input_range.min, reliefmap_input_range.max);
     }
 
     std::stringstream ss;
@@ -166,9 +161,9 @@ int main (int argc, char** argv)
     ss << ord << (ord == 1 ? "st" : (ord == 2 ? "nd" : (ord == 3 ? "rd" : "th")))
        << " order HEALPix data from " << fitsfilename << " plotted at "
        << pord << (pord == 1 ? "st" : (pord == 2 ? "nd" : (pord == 3 ? "rd" : "th"))) << " order\n";
-    v.addLabel (ss.str(), {0.0f, 0.0f, 0.0f}, morph::TextFeatures{0.005f, centre_horz});
+    v.addLabel (ss.str(), {0.0f, 0.0f, 0.0f}, mplot::TextFeatures{0.005f, centre_horz});
 
-    // Finalize and add the model to the morph::Visual scene
+    // Finalize and add the model to the mplot::Visual scene
     hpv->finalize();
     v.addVisualModel (hpv);
 

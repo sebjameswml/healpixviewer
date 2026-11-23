@@ -1,3 +1,7 @@
+# This code has moved
+
+This healpix viewer is now maintained [at this location](https://github.com/sebsjames/healpixviewer).
+
 # HEALPix Viewer program
 
 ![A view of Earth's topograpy and the cosmic microwave background radiation](https://github.com/sebjameswml/healpixviewer/blob/main/images/Earth_and_CMBR.png?raw=true)
